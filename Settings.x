@@ -9,7 +9,7 @@
 #import <YouTubeHeader/YTSettingsViewController.h>
 #import <YouTubeHeader/YTIIcon.h>
 
-// #define TweakName @"FLEXHelperForYT"
+#define TweakName @"FLEXHelperForYT"
 
 #define EnablesTweakKey @"FLEXHelperForYTActivateTweak"
 
