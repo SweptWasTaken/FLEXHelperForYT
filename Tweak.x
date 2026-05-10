@@ -1,3 +1,11 @@
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+@interface FLEXManager : NSObject
+- (void)sharedManager;
+- (void)showExplorer;
+@end
+
 extern BOOL EnablesTweak();
 
 %hook YTAppDelegate

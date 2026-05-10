@@ -23,6 +23,11 @@ static const NSInteger TweakSection = 'fhyt';
 - (void)updateFLEXHelperForYTSectionWithEntry:(id)entry;
 @end
 
+@interface FLEXManager : NSObject
+- (void)sharedManager;
+- (void)showExplorer;
+@end
+
 BOOL EnablesTweak() {
     return [[NSUserDefaults standardUserDefaults] boolForKey:EnablesTweakKey];
 }
