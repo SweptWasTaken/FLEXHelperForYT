@@ -1,0 +1,9 @@
+Package: dev.water888.flexhelperforyt
+Name: FLEXHelperForYT
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Description: A simple tweak to activate a FLEX explorer window in YouTube app.
+Maintainer: Tonwalter888
+Author: Tonwalter888
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 15.0)
