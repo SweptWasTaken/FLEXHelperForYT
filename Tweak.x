@@ -6,16 +6,19 @@
 - (void)showExplorer;
 @end
 
-extern BOOL EnablesTweak();
-
 %hook YTAppDelegate
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary<UIApplicationLaunchOptionsKey, id> *)launchOptions {
     BOOL didFinishLaunching = %orig;
-    if (EnablesTweak()) [[%c(FLEXManager) performSelector:@selector(sharedManager)] performSelector:@selector(showExplorer)];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [[%c(FLEXManager) performSelector:@selector(sharedManager)] performSelector:@selector(showExplorer)];
+    });
     return didFinishLaunching;
 }
+
 - (void)appWillResignActive:(id)arg1 {
     %orig;
-    if (EnablesTweak()) [[%c(FLEXManager) performSelector:@selector(sharedManager)] performSelector:@selector(showExplorer)];
+    [[%c(FLEXManager) performSelector:@selector(sharedManager)] performSelector:@selector(showExplorer)];
 }
+
 %end
