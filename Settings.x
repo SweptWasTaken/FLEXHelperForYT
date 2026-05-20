@@ -23,10 +23,7 @@ static const NSInteger TweakSection = 'fhyt';
 - (void)updateFLEXHelperForYTSectionWithEntry:(id)entry;
 @end
 
-@interface FLEXManager : NSObject
-- (void)sharedManager;
-- (void)showExplorer;
-@end
+extern void showFLEXExplorer();
 
 BOOL EnablesTweak() {
     return [[NSUserDefaults standardUserDefaults] boolForKey:EnablesTweakKey];
@@ -94,25 +91,14 @@ NSBundle *FLEXHelperForYTBundle() {
         }];
     [sectionItems addObject:tweakVersion];
 
-    // Activate Tweak
-    YTSettingsSectionItem *enablesTweak = [YTSettingsSectionItemClass switchItemWithTitle:@"Auto activates FLEX"
-        titleDescription:@"Automatically activates FLEX explorer on startup"
-        accessibilityIdentifier:nil
-        switchOn:EnablesTweak()
-        switchBlock:^BOOL (YTSettingsCell *cell, BOOL enabled) {
-            [[NSUserDefaults standardUserDefaults] setBool:enabled forKey:EnablesTweakKey];
-            return YES;
-        }
-        settingItemId:0];
-    [sectionItems addObject:enablesTweak];
-
     // Activate FLEX
-    YTSettingsSectionItem *activate = [YTSettingsSectionItemClass itemWithTitle:@"Activates FLEX"
-        titleDescription:@"Tap here to activates FLEX explorer"
+    YTSettingsSectionItem *activate = [YTSettingsSectionItemClass itemWithTitle:@"Activate FLEX"
+        titleDescription:@"Loads and shows the FLEX explorer (first tap loads FLEX into the process)"
         accessibilityIdentifier:nil
         detailTextBlock:nil
         selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
-            return [[%c(FLEXManager) performSelector:@selector(sharedManager)] performSelector:@selector(showExplorer)];
+            showFLEXExplorer();
+            return YES;
         }
     ];
     [sectionItems addObject:activate];

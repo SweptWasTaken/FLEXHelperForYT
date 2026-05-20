@@ -7,25 +7,28 @@
 - (void)showExplorer;
 @end
 
-static BOOL flexLoaded = NO;
+BOOL flexLoaded = NO;
 
-static void loadFLEX() {
-    NSString *flexPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Frameworks/FLEX.framework/FLEX"];
+// Called on-demand from Settings.x — NOT at startup.
+// FLEX must not load during dyld init because its +load methods modify the ObjC
+// runtime in ways that cause YouTube's own +load to trap (EXC_BAD_INSTRUCTION).
+BOOL loadFLEXIfNeeded() {
+    if (flexLoaded) return YES;
+    NSString *flexPath = [[[NSBundle mainBundle] bundlePath]
+                          stringByAppendingPathComponent:@"Frameworks/FLEX.framework/FLEX"];
     flexLoaded = dlopen([flexPath UTF8String], RTLD_NOW) != NULL;
+    return flexLoaded;
+}
+
+void showFLEXExplorer() {
+    if (loadFLEXIfNeeded()) {
+        [[%c(FLEXManager) sharedManager] showExplorer];
+    }
 }
 
 %hook YTAppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary<UIApplicationLaunchOptionsKey, id> *)launchOptions {
-    BOOL didFinishLaunching = %orig;
-    if (flexLoaded) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [[%c(FLEXManager) sharedManager] showExplorer];
-        });
-    }
-    return didFinishLaunching;
-}
-
+// Re-surface FLEX when returning to foreground, but only if already loaded.
 - (void)appWillResignActive:(id)arg1 {
     %orig;
     if (flexLoaded) {
@@ -36,6 +39,8 @@ static void loadFLEX() {
 %end
 
 %ctor {
-    loadFLEX();
+    // Do NOT dlopen FLEX here. Loading FLEX during dyld startup runs FLEX's
+    // +load methods before YouTube's own +load, causing YouTube to crash.
+    // FLEX is loaded lazily from Settings when the user taps "Activate FLEX".
     %init;
 }
