@@ -38,9 +38,23 @@ void showFLEXExplorer() {
 
 %end
 
+%hook UIApplication
+
+// Shake the phone to load and show FLEX.
+// Primary activation method — YouTube 21.x settings injection does not
+// reliably surface the FLEXHelperForYT section on all devices/versions.
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
+    %orig;
+    if (motion == UIEventSubtypeMotionShake) {
+        showFLEXExplorer();
+    }
+}
+
+%end
+
 %ctor {
     // Do NOT dlopen FLEX here. Loading FLEX during dyld startup runs FLEX's
     // +load methods before YouTube's own +load, causing YouTube to crash.
-    // FLEX is loaded lazily from Settings when the user taps "Activate FLEX".
+    // FLEX loads lazily: shake the phone or tap "Activate FLEX" in Settings.
     %init;
 }
